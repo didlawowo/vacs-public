@@ -12,6 +12,7 @@ from operator import itemgetter
 from typing import Optional, List
 
 VECTOR_NAME = "rag_lance"
+TOKEN_INPUT_LIMIT = 110000
 
 log = setup_logging()
 embeddings = get_embeddings(VECTOR_NAME)
@@ -43,11 +44,14 @@ Your Answer (only if relevant to the question, say "I can't help with your quest
 prompt = ChatPromptTemplate.from_template(template)
 
 def format_docs(docs):
-    return "\n\n".join(doc.page_content for doc in docs)[:110000]
+    return "\n\n".join(doc.page_content for doc in docs)[:TOKEN_INPUT_LIMIT]
 
 # chat history
 chat_summary = """Summarise the conversation below:
+# Chat History
 {chat_history}
+# End Chat History
+Your Summary of the chat history above:
 """
 summary_prompt = ChatPromptTemplate.from_template(chat_summary)
 
@@ -71,7 +75,7 @@ def load_chat_history(input_dict):
                 str += f"{history.name} {history.content}\n"
 
     log.debug(f"Got chat history:\n {str}")
-    return str 
+    return str[:TOKEN_INPUT_LIMIT]
    
 def format_chat_history(chat_history):
     str = load_chat_history(chat_history)
@@ -85,6 +89,7 @@ def format_chat_summary(input_dict):
     # no summary if under 1000
     if len(str) < 1000:
         return "No summary"
+
     return str
 
 summary_branch = RunnableBranch(

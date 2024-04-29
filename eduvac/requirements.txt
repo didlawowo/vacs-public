@@ -1,0 +1,15 @@
+beautifulsoup4
+langchain
+langserve
+langchain-cli
+uvicorn
+google-cloud-storage 
+sunholo>=0.21.28
+openai
+tiktoken
+pydantic==1.10.13
+pg8000
+greenlet
+langchain-google-alloydb-pg
+langchain-anthropic
+pydantic==1.10.13

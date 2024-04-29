@@ -40,3 +40,27 @@ image_talk:
   tags: ["free"]
   avatar_url: https://avatars.githubusercontent.com/u/1342004?s=200&v=4
   description: A picture is worth a thousand words, so upload your picture and ask your question to the Gemini Pro Vision model.  Images are remembered for your conversation until you upload another.  This offers powerful applications, which you can get a feel for via the [Gemini Pro Vision docs](https://cloud.google.com/vertex-ai/docs/generative-ai/multimodal/design-multimodal-prompts) 
+eduvac:
+  llm: anthropic
+  model: claude-3-opus-20240229
+  agent: eduvac # needs to match multivac service name
+  agent_type: langserve
+  display_name: Edu-VAC
+  tags: ["eduvac"]
+  avatar_url: ../public/eduvac.png
+  description: Educate yourself in your own personal documents via guided learning from Eduvac, the ever patient teacher bot. Use search filters to examine available syllabus or upload your own documents to get started.
+  upload:   # to accept uploads of private documents to a bucket
+    mime_types:
+      - all
+    buckets:
+      all: your-bucket
+  buckets:
+    raw: your-bucket
+  docstore: # this needs to be valid to have document storage
+    - alloydb-docstore:
+        type: alloydb
+  alloydb_config:
+    project_id: your-projectid
+    region: europe-west1
+    cluster: your-cluster
+    instance: primary-instance-1
