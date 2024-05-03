@@ -1,11 +1,12 @@
 import chainlit as cl
 from .config import lookup_config, convert_field
-from .sources import create_doc_elements, stream_sources
+from .sources import stream_sources
 import os
 from .log import log
-from sunholo.database.alloydb import get_sources_from_docstore_async
 
-import asyncio
+from sunholo.database.alloydb import get_sources_from_docstore_async
+from sunholo.utils.gcp import is_running_on_gcp
+
 
 # "run", "tool", "llm", "embedding", "retrieval", "rerank", "undefined"
 @cl.step(name="Getting sample documents", type="tool")
@@ -20,6 +21,10 @@ async def fetch_sample_docs(settings):
     source_filters = convert_field(settings.get("source_filters"))
     search_type = "AND" if settings.get("source_filters_and_or", False) else "OR"
     matching_files = None
+
+    if not is_running_on_gcp():
+        await msg.stream_token("Not running on GCP so not attempting to connect to AlloyDB document server")
+        return msg
 
     if source_filters:
         try:
