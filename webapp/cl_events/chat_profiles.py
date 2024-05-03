@@ -1,6 +1,8 @@
 import chainlit as cl
 from sunholo.utils import load_config
 
+from .log import log
+
 configs, filename = load_config("config/llm_config.yaml")
 
 def to_proper_case(s):
@@ -24,36 +26,45 @@ def create_chat_profile(name, config):
         icon=config.get("avatar_url", "public/logo_light.png")
     )
 
-def tailor_chat_profiles(tags=None):
+def tailor_chat_profiles(tags):
     # Check if tags is None or a list of strings
-    if tags is not None and not all(isinstance(tag, str) for tag in tags):
-        raise ValueError("Tags must be a list of strings or None")
+    log.info(f"Chat profile tags: {tags}")
 
     chat_profiles = []
-    if tags is not None:
-        for name, value in configs.items():
-            if name in tags:
-                chat_profile = create_chat_profile(name, configs[name])
-                chat_profiles.append(chat_profile)
-    else:
-        for name, value in configs.items():
-            chat_profile = create_chat_profile(name, configs[name])
+    for name, config in configs.items():
+        profile_tags = config.get("tags", [])  # Extract tags from config
+
+        # Matching Logic (Choose one option below)
+        if "admin" in tags:  # Option 1:  Show all profiles if an admnin tag
+            match = True  
+        else:
+            match = False
+            if profile_tags:
+                match = any(tag in profile_tags for tag in tags)  # Option 2: Match any tag
+
+        if match:
+            log.info(f"Matching tag: {name} in {profile_tags} for {tags}")
+            chat_profile = create_chat_profile(name, config)
             chat_profiles.append(chat_profile)
-    
+        else:
+            log.info(f"No match for {name} in {profile_tags} for {tags}")
+
     return chat_profiles
 
 
 
 
 async def chat_profile_logic(current_user: cl.User):
+    log.info(f"chat_profile_logic checking current_user.metadata.role: {current_user.metadata}")
     if current_user.metadata["role"] == "ADMIN":
-        admin_profiles = tailor_chat_profiles()
+        admin_profiles = tailor_chat_profiles(["admin"])
         return admin_profiles
     elif current_user.metadata["role"] == "USER":
-        user_profiles = tailor_chat_profiles(["multivac_docs", "pirate_speak","csv_agent"])
-        return user_profiles
+        return tailor_chat_profiles(["free"])
+    elif current_user.metadata["role"] == "eduvac":
+        return tailor_chat_profiles(["eduvac"])
     else:
-        free_profiles = tailor_chat_profiles(["multivac_docs", "pirate_speak", "csv_agent"])
+        free_profiles = tailor_chat_profiles(["free"])
         return free_profiles
     #TODO: different chat_profiles based on current_user.tags
     return tailor_chat_profiles()

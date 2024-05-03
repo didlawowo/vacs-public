@@ -1,4 +1,5 @@
 import chainlit as cl
+import logging
 from chainlit.types import ThreadDict
 
 from typing import Optional, Dict
@@ -12,6 +13,9 @@ from cl_events import (
     on_chat_resume_logic,
     oauth_callback_logic
     )
+
+logger_httpx = logging.getLogger('httpx')
+logger_httpx.setLevel(logging.WARNING)
 
 @cl.on_message
 async def main(message: cl.Message):
