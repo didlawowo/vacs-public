@@ -2,3 +2,5 @@
 webapp/.env
 *.pyc
 .envrc
+webapp/.chainlit/translations/fr-FR.json
+webapp/config
