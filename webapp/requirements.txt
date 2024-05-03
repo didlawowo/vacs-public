@@ -1,2 +1,4 @@
 chainlit>=1.0.100
 sunholo>=0.11.5
+google-cloud-pubsub 
+flask
