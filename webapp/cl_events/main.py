@@ -27,7 +27,7 @@ async def main_logic(message: cl.Message):
             user_input,
             vector_name=config["name"],
             chat_history=chat_history,
-            generate_f_output=generate_chainlit_output,
+            generate_f_output=lambda x: x, # this is for parsing the response if required
             # kwargs
             stream_wait_time=0.5,
             stream_timeout=120,
