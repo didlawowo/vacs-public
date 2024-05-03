@@ -21,9 +21,9 @@ def oauth_callback_logic(
               metadata = {"role":"ADMIN", 
                           "provider":"google", 
                           "tags":["admin_user"],
-                          "hd": raw_user_data["hd"],
-                          "locale": raw_user_data["locale"],
-                          "email": raw_user_data["email"]
+                          "hd": raw_user_data.get("hd"),
+                          "locale": raw_user_data.get("locale"),
+                          "email": raw_user_data.get("email")
                           }
           )
     else:
@@ -33,8 +33,8 @@ def oauth_callback_logic(
                        "provider":"google", 
                        "tags":["user"],
                        "hd": raw_user_data.get("hd"),
-                       "locale": raw_user_data["locale"],
-                       "email": raw_user_data["email"]
+                       "locale": raw_user_data.get("locale"),
+                       "email": raw_user_data.get("email")
                       }
         )
   return cl.User(
@@ -43,7 +43,7 @@ def oauth_callback_logic(
                        "provider": provider_id, 
                        "tags":["user", "free"],
                        "hd": raw_user_data.get("hd"),
-                       "locale": raw_user_data["locale"],
-                       "email": raw_user_data["email"]
+                       "locale": raw_user_data.get("locale"),
+                       "email": raw_user_data.get("email")
                       }
         )
