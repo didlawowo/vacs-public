@@ -3,6 +3,7 @@ from chainlit import make_async
 import chainlit as cl
 from sunholo.gcs.add_file import add_file_to_gcs
 from sunholo.chunker.loaders import read_file_to_documents
+from sunholo.utils.gcp import is_running_on_gcp
 from .config import lookup_config
 from .log import log
 
@@ -32,6 +33,10 @@ async_read_file_to_documents = make_async(read_file_to_documents)
 # "run", "tool", "llm", "embedding", "retrieval", "rerank", "undefined"
 @cl.step(name="Parsing document", type="retrieval")
 async def process_docs_tool(file):
+    if not is_running_on_gcp():
+        log.warning(f"Not running on GCP so assuming no Embedding Pipeline available to process {file}")
+        return ""
+    
     docs = await async_read_file_to_documents(file, metadata={"type":"private_upload"})
     content = ""
     for doc in docs:
@@ -46,6 +51,10 @@ async def process_uploads_tool(file, vector_name, message_content):
     bucket, file_type = get_bucket_and_type(file.mime)
     if not bucket:
         log.error(f"No bucket defined for file type {file.mime}")
+        return None, None
+    
+    if not is_running_on_gcp():
+        log.warning(f"Not running on GCP, not attempting to upload {file} to GCS bucket")
         return None, None
     
     log.info(f"Uploading file {file}")
